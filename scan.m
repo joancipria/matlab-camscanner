@@ -1,7 +1,7 @@
 %---------------------
 %---- Leer imagen ----
 %---------------------
-image = imread('test1.jpg');
+image = imread('test2.jpg');
 original = image;
 
 %figure();
@@ -82,8 +82,7 @@ end
 [M,I] = maxk(distances,4);
 bestCorners = corners([I],:);
 
-% NO FUNCIONA DE MOMENTO
-%corners = bestCorners;
+corners = bestCorners;
 
 % Mostramos las esquinas
 imshow(image); hold on;
@@ -93,6 +92,7 @@ plot(corners);
 %--- Corrección de perspectiva ----
 %---------------------------------- 
 
+% Detectamos que esquina es cada punto
  topLeft = corners(3,:);
  topRight = corners(4,:);
  botRight = corners(1,:);
@@ -102,10 +102,7 @@ plot(corners);
 
  fixedPoints=[0 0;size(image,1) 0;size(image,1) size(image,2);0 size(image,2)];
  
- % APAÑO RAPIDO QUE DEBE SER CORREJIDO
- image = imrotate(image,90);
-
- TFORM = fitgeotrans(movingPoints,fixedPoints,'projective');
+TFORM = fitgeotrans(movingPoints,fixedPoints,'projective');
 R=imref2d(size(image),[1 size(image,2)],[1 size(image,1)]);
 
 imgTransformed=imwarp(original,TFORM,'OutputView',R);
