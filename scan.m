@@ -65,7 +65,7 @@ corners = corners.selectStrongest(cornersNum).Location;
 props = regionprops(image, 'Centroid');
 xyCentroid = vertcat(props.Centroid);
 
-% Obtener las 4 esquinas más lejanas del centro
+% *** Obtener las 4 esquinas más lejanas del centro ***
 % Separamos en X e Y los corners
 x = corners(:,1);
 y = corners(:,end);
@@ -82,6 +82,7 @@ end
 [M,I] = maxk(distances,4);
 bestCorners = corners([I],:);
 
+% Sobreescribimos corners con las 4 esquinas
 corners = bestCorners;
 
 % Mostramos las esquinas
@@ -92,18 +93,22 @@ plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
 %--- Corrección de perspectiva ----
 %---------------------------------- 
 
-% Detectamos que esquina es cada punto
- topLeft = corners(3,:);
- topRight = corners(4,:);
- botRight = corners(1,:);
- botLeft = corners(2,:);
- 
- movingPoints = [topLeft; topRight; botRight; botLeft;];
+% Detectamos que esquina es cada punto (TODO: debe ser dinámico)
+topLeft = corners(3,:);
+topRight = corners(4,:);
+botRight = corners(1,:);
+botLeft = corners(2,:);
 
- fixedPoints=[0 0;size(image,1) 0;size(image,1) size(image,2);0 size(image,2)];
- 
+% Array de los 4 puntos móviles
+movingPoints = [topLeft; topRight; botRight; botLeft;];
+
+% Array de los 4 puntos fijos (las esquinas de la imagen final)
+fixedPoints=[0 0;size(image,1) 0;size(image,1) size(image,2);0 size(image,2)];
+
+% Aplicamos transformación de perspectiva
 TFORM = fitgeotrans(movingPoints,fixedPoints,'projective');
 R=imref2d(size(image),[1 size(image,2)],[1 size(image,1)]);
-
 imgTransformed=imwarp(original,TFORM,'OutputView',R);
+
+% Mostramos imagen
 figure, imshow(imgTransformed);
