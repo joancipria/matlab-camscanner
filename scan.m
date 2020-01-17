@@ -50,11 +50,11 @@ title('Close');
 imshow(image,[]);
 title('Close');
 
-%----------------------------
-%--- Detección de bordes ----
-%----------------------------
+%------------------------------
+%--- Detección de esquinas ----
+%------------------------------
 
-% Detectamos esquinas
+% --- Detectamos todas las esquinas ---
 corners = detectHarrisFeatures(image);
 
 % Cogemos las 10 más fuertes
@@ -65,7 +65,7 @@ corners = corners.selectStrongest(cornersNum).Location;
 props = regionprops(image, 'Centroid');
 xyCentroid = vertcat(props.Centroid);
 
-% *** Obtener las 4 esquinas más lejanas del centro ***
+% --- Obtenemos las 4 esquinas más lejanas del centro ---
 % Separamos en X e Y los corners
 x = corners(:,1);
 y = corners(:,end);
@@ -89,15 +89,40 @@ corners = bestCorners;
 imshow(image); hold on;
 plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
 
+% --- Clasificamos esquinas ---
+
+% Primero clasificamos esquinas en LEFT y RIGHT
+
+% RIGHT (X máxima)
+[rightCorners, indexRightCorners] = maxk(corners(:,1),2);
+rightCorners = corners(indexRightCorners,:);
+
+% LEFT (X mínima)
+[leftCorners, indexLeftCorners] = mink(corners(:,1),2);
+leftCorners = corners(indexLeftCorners,:);
+
+% Luego combinamos con TOP y BOTTOM y sacamos la clasificación final
+
+% BOTTOM LEFT
+[botLeft, indexBotLeft] = maxk(leftCorners(:,end),1);
+botLeft = leftCorners(indexBotLeft,:);
+
+% BOTTOM RIGHT
+[botRight, indexBotRight] = maxk(rightCorners(:,end),1);
+botRight = rightCorners(indexBotRight,:);
+
+% TOP RIGHT
+[topRight, indexTopRight] = mink(rightCorners(:,end),1);
+topRight = rightCorners(indexTopRight,:);
+
+% TOP LEFT
+[topLeft, indexTopLeft] = mink(leftCorners(:,end),1);
+topLeft = leftCorners(indexTopLeft,:);
+
+
 %----------------------------------
 %--- Corrección de perspectiva ----
 %---------------------------------- 
-
-% Detectamos que esquina es cada punto (TODO: debe ser dinámico)
-topLeft = corners(3,:);
-topRight = corners(4,:);
-botRight = corners(1,:);
-botLeft = corners(2,:);
 
 % Array de los 4 puntos móviles
 movingPoints = [topLeft; topRight; botRight; botLeft;];
