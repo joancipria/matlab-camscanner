@@ -13,6 +13,8 @@ title('Original');
 %--- Preprocesado ----
 %---------------------
 
+% TODO: Mejorar el tratamiento para distintas situaciones
+
 % *** Convertir imagen a escala de grises ***
 image = rgb2gray(image);
 
@@ -53,6 +55,10 @@ title('Close');
 %------------------------------
 %--- Detección de esquinas ----
 %------------------------------
+
+% TODO: Que las 4 esquinas más lejanas tengan
+% una separación mínima entre sí. A veces al coger las 4
+% esquinas más lejanas no coinciden con las esquinas
 
 % --- Detectamos todas las esquinas ---
 corners = detectHarrisFeatures(image);
