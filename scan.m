@@ -65,7 +65,25 @@ corners = corners.selectStrongest(cornersNum).Location;
 props = regionprops(image, 'Centroid');
 xyCentroid = vertcat(props.Centroid);
 
-% Nos quedamos con las 4 esquinas más lejanas del centro
+% Obtener las 4 esquinas más lejanas del centro
+% Separamos en X e Y los corners
+x = corners(:,1);
+y = corners(:,end);
+
+% Calculamos distancias de cada corner respecto al centro
+for k = 1 : cornersNum
+    d = sqrt((xyCentroid(:,1)-x(k)).^2 + (xyCentroid(:,end)-y(k)).^2);
+    %logMsg = [' Centroid at (',num2str(xyCentroid(:,1)),' , ', num2str(xyCentroid(:,end)), ') is at ', num2str(d), ' from point #',num2str(k),' at (',num2str(x(k)),' , ',num2str(y(k)),')'];
+    %disp(logMsg)
+    [distances(k), indexOfMax(k)] = max(d);
+end
+
+% Nos quedamos con las 4 esquinas más lejanas 
+[M,I] = maxk(distances,4);
+bestCorners = corners([I],:);
+
+% NO FUNCIONA DE MOMENTO
+%corners = bestCorners;
 
 % Mostramos las esquinas
 imshow(image); hold on;
@@ -83,6 +101,8 @@ plot(corners);
  movingPoints = [topLeft; topRight; botRight; botLeft;];
 
  fixedPoints=[0 0;size(image,1) 0;size(image,1) size(image,2);0 size(image,2)];
+ 
+ % APAÑO RAPIDO QUE DEBE SER CORREJIDO
  image = imrotate(image,90);
 
  TFORM = fitgeotrans(movingPoints,fixedPoints,'projective');
