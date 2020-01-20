@@ -4,7 +4,7 @@
 clear; clc;
 
 % Añadimos funciones
-addpath('source/');
+addpath('src/');
 
 % Leemos imagen
 image = readImage('test1.jpg');
