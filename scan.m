@@ -1,7 +1,7 @@
 %---------------------
 %---- Leer imagen ----
 %---------------------
-image = imread('test2.jpg');
+image = imread('test1.jpg');
 original = image;
 
 %figure();
@@ -61,7 +61,7 @@ title('Close');
 % esquinas más lejanas no coinciden con las esquinas
 
 % --- Detectamos todas las esquinas ---
-corners = detectHarrisFeatures(image);
+corners = detectMinEigenFeatures(image);
 
 % Cogemos las 10 más fuertes
 cornersNum = 10;
