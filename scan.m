@@ -2,7 +2,7 @@
 %---- Leer imagen ----
 %---------------------
 
-image = imread('test4.jpg');
+image = imread('test1.jpg');
 original = image;
 figure, imshow(image);
 
