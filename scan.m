@@ -1,13 +1,10 @@
 %---------------------
 %---- Leer imagen ----
 %---------------------
-image = imread('test1.jpg');
+
+image = imread('test4.jpg');
 original = image;
-
-%figure();
-imshow(image);
-title('Original');
-
+figure, imshow(image);
 
 %---------------------
 %--- Preprocesado ----
@@ -16,54 +13,53 @@ title('Original');
 % TODO: Mejorar el tratamiento para distintas situaciones
 
 % *** Convertir imagen a escala de grises ***
-image = rgb2gray(image);
+imageGS = rgb2gray(image);
 
-% *** Thresholding ***
-image = imbinarize(image); 
+% *** Aplicar una equalizaciÛn de hist adaptativa ***
+imageHEQ = adapthisteq(imageGS);
 
-%figure();
-imshow(image,[]);
-title('Thresholding');
+% *** CorrecciÛn iluminaciÛn ***
+MN = size(imageHEQ);
+background = imopen(imageHEQ,strel('rectangle',MN));
+I2 = imsubtract(imageHEQ,background);
+I3= imadjust(I2);
+
+% *** Imagen binaria ***
+level = graythresh(imageGS);
+d = imbinarize(I3,level);
+bw = bwareaopen(d, 50);
+
+image = bw;
 
 % *** Open ***
-seOpenSize = 10;
+seOpenSize = 20;
 seOpen = strel('square',seOpenSize);
 image = imopen(image,seOpen);
 
-imshow(image,[]);
-title('Open');
-
-
 % *** Fill ***
 image = imfill(image,'holes');
-
-imshow(image,[]);
-title('Fill');
 
 % *** Close ***
 seCloseSize = 50;
 seClose = strel('square',seCloseSize);
 image = imclose(image,seClose);
 
-imshow(image,[]);
-title('Close');
+BW2 = bwareaopen(image, 4000);
 
-%figure();
-imshow(image,[]);
-title('Close');
+image = BW2;
 
 %------------------------------
-%--- Detecci√≥n de esquinas ----
+%--- DetecciÛn de esquinas ----
 %------------------------------
 
-% TODO: Que las 4 esquinas m√°s lejanas tengan
-% una separaci√≥n m√≠nima entre s√≠. A veces al coger las 4
-% esquinas m√°s lejanas no coinciden con las esquinas
+% TODO: Que las 4 esquinas m·s lejanas tengan
+% una separaciÛn mÌnima entre sÌ. A veces al coger las 4
+% esquinas m·s lejanas no coinciden con las esquinas
 
 % --- Detectamos todas las esquinas ---
 corners = detectMinEigenFeatures(image);
 
-% Cogemos las 10 m√°s fuertes
+% Cogemos las 10 m·s fuertes
 cornersNum = 10;
 corners = corners.selectStrongest(cornersNum).Location;
 
@@ -71,7 +67,7 @@ corners = corners.selectStrongest(cornersNum).Location;
 props = regionprops(image, 'Centroid');
 xyCentroid = vertcat(props.Centroid);
 
-% --- Obtenemos las 4 esquinas m√°s lejanas del centro ---
+% --- Obtenemos las 4 esquinas m·s lejanas del centro ---
 % Separamos en X e Y los corners
 x = corners(:,1);
 y = corners(:,end);
@@ -84,7 +80,7 @@ for k = 1 : cornersNum
     [distances(k), indexOfMax(k)] = max(d);
 end
 
-% Nos quedamos con las 4 esquinas m√°s lejanas 
+% Nos quedamos con las 4 esquinas m·s lejanas 
 [M,I] = maxk(distances,4);
 bestCorners = corners([I],:);
 
@@ -99,15 +95,15 @@ plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
 
 % Primero clasificamos esquinas en LEFT y RIGHT
 
-% RIGHT (X m√°xima)
+% RIGHT (X m·xima)
 [rightCorners, indexRightCorners] = maxk(corners(:,1),2);
 rightCorners = corners(indexRightCorners,:);
 
-% LEFT (X m√≠nima)
+% LEFT (X mÌnima)
 [leftCorners, indexLeftCorners] = mink(corners(:,1),2);
 leftCorners = corners(indexLeftCorners,:);
 
-% Luego combinamos con TOP y BOTTOM y sacamos la clasificaci√≥n final
+% Luego combinamos con TOP y BOTTOM y sacamos la clasificaciÛn final
 
 % BOTTOM LEFT
 [botLeft, indexBotLeft] = maxk(leftCorners(:,end),1);
@@ -125,18 +121,17 @@ topRight = rightCorners(indexTopRight,:);
 [topLeft, indexTopLeft] = mink(leftCorners(:,end),1);
 topLeft = leftCorners(indexTopLeft,:);
 
-
 %----------------------------------
-%--- Correcci√≥n de perspectiva ----
+%--- CorrecciÛn de perspectiva ----
 %---------------------------------- 
 
-% Array de los 4 puntos m√≥viles
+% Array de los 4 puntos mÛviles
 movingPoints = [topLeft; topRight; botRight; botLeft;];
 
 % Array de los 4 puntos fijos (las esquinas de la imagen final)
 fixedPoints=[0 0;size(image,2) 0;size(image,2) size(image,1);0 size(image,1)];
 
-% Aplicamos transformaci√≥n de perspectiva
+% Aplicamos transformaciÛn de perspectiva
 TFORM = fitgeotrans(movingPoints,fixedPoints,'projective');
 R=imref2d(size(image),[1 size(image,2)],[1 size(image,1)]);
 imgTransformed=imwarp(original,TFORM,'OutputView',R);
