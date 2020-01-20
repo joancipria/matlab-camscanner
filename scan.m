@@ -15,10 +15,10 @@ figure, imshow(image);
 % *** Convertir imagen a escala de grises ***
 imageGS = rgb2gray(image);
 
-% *** Aplicar una equalizaci�n de hist adaptativa ***
+% *** Aplicar una equalizacion de hist adaptativa ***
 imageHEQ = adapthisteq(imageGS);
 
-% *** Correcci�n iluminaci�n ***
+% *** Correccion iluminacion ***
 MN = size(imageHEQ);
 background = imopen(imageHEQ,strel('rectangle',MN));
 I2 = imsubtract(imageHEQ,background);
@@ -49,17 +49,17 @@ BW2 = bwareaopen(image, 4000);
 image = BW2;
 
 %------------------------------
-%--- Detecci�n de esquinas ----
+%--- Deteccion de esquinas ----
 %------------------------------
 
-% TODO: Que las 4 esquinas m�s lejanas tengan
-% una separaci�n m�nima entre s�. A veces al coger las 4
-% esquinas m�s lejanas no coinciden con las esquinas
+% TODO: Que las 4 esquinas mas lejanas tengan
+% una separacion minima entre si. A veces al coger las 4
+% esquinas mas lejanas no coinciden con las esquinas
 
 % --- Detectamos todas las esquinas ---
 corners = detectMinEigenFeatures(image);
 
-% Cogemos las 10 m�s fuertes
+% Cogemos las 10 mas fuertes
 cornersNum = 10;
 corners = corners.selectStrongest(cornersNum).Location;
 
@@ -67,7 +67,7 @@ corners = corners.selectStrongest(cornersNum).Location;
 props = regionprops(image, 'Centroid');
 xyCentroid = vertcat(props.Centroid);
 
-% --- Obtenemos las 4 esquinas m�s lejanas del centro ---
+% --- Obtenemos las 4 esquinas mas lejanas del centro ---
 % Separamos en X e Y los corners
 x = corners(:,1);
 y = corners(:,end);
@@ -80,7 +80,7 @@ for k = 1 : cornersNum
     [distances(k), indexOfMax(k)] = max(d);
 end
 
-% Nos quedamos con las 4 esquinas m�s lejanas 
+% Nos quedamos con las 4 esquinas mas lejanas 
 [M,I] = maxk(distances,4);
 bestCorners = corners([I],:);
 
@@ -95,15 +95,15 @@ plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
 
 % Primero clasificamos esquinas en LEFT y RIGHT
 
-% RIGHT (X m�xima)
+% RIGHT (X maxima)
 [rightCorners, indexRightCorners] = maxk(corners(:,1),2);
 rightCorners = corners(indexRightCorners,:);
 
-% LEFT (X m�nima)
+% LEFT (X minima)
 [leftCorners, indexLeftCorners] = mink(corners(:,1),2);
 leftCorners = corners(indexLeftCorners,:);
 
-% Luego combinamos con TOP y BOTTOM y sacamos la clasificaci�n final
+% Luego combinamos con TOP y BOTTOM y sacamos la clasificacion final
 
 % BOTTOM LEFT
 [botLeft, indexBotLeft] = maxk(leftCorners(:,end),1);
@@ -122,16 +122,21 @@ topRight = rightCorners(indexTopRight,:);
 topLeft = leftCorners(indexTopLeft,:);
 
 %----------------------------------
-%--- Correcci�n de perspectiva ----
+%--- Corrección de perspectiva ----
 %---------------------------------- 
 
-% Array de los 4 puntos m�viles
+% Array de los 4 puntos moviles
 movingPoints = [topLeft; topRight; botRight; botLeft;];
 
-% Array de los 4 puntos fijos (las esquinas de la imagen final)
+% Tamaño final de la imagen
+
+% Distancia entre TOP LEFT y TOP RIGHT
 finalWidth = round(sqrt((topLeft(:,1)-topRight(:,1)).^2 + (topLeft(:,end)-topRight(:,end)).^2));
+
+% Distancia entre TOP LEFT y BOTTOM LEFT
 finalHeight = round(sqrt((topLeft(:,1)-botLeft(:,1)).^2 + (topLeft(:,end)-botLeft(:,end)).^2));
 
+% Array de los 4 puntos fijos (las esquinas de la imagen final)
 fixedPoints=[0 0;finalWidth 0;finalWidth finalHeight;0 finalHeight];
 
 % Aplicamos transformaci�n de perspectiva
