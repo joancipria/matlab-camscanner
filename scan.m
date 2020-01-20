@@ -134,7 +134,7 @@ topLeft = leftCorners(indexTopLeft,:);
 movingPoints = [topLeft; topRight; botRight; botLeft;];
 
 % Array de los 4 puntos fijos (las esquinas de la imagen final)
-fixedPoints=[0 0;size(image,1) 0;size(image,1) size(image,2);0 size(image,2)];
+fixedPoints=[0 0;size(image,2) 0;size(image,2) size(image,1);0 size(image,1)];
 
 % Aplicamos transformación de perspectiva
 TFORM = fitgeotrans(movingPoints,fixedPoints,'projective');
