@@ -40,8 +40,8 @@ function corners = detectCorners(image)
     corners = bestCorners;
 
     % Mostramos las esquinas
-    imshow(image); hold on;
-    plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
+    %imshow(image); hold on;
+    %plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
 
     % --- Clasificamos esquinas ---
 
