@@ -9,7 +9,7 @@
 function corners = detectCorners(image, method)
 
     % --- MÉTODO REGIONPROPS ---
-    if strcmp(method,'extrema') == 1
+    if strcmp(method,'Regionprops') == 1
         corners = regionprops(image,'Extrema');
         assignin('base','stats',corners);
 
