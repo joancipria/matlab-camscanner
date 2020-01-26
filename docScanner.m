@@ -15,7 +15,7 @@ figure, imshow(image);
 image = preprocessing(image);
 
 % Detectamos las esquinas
-corners = detectCorners(image);
+corners = detectCorners(image, 'extrema');
 
 % Corregimos perspectiva
 image = fixPerspective(originalImage, corners);
