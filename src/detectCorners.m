@@ -19,10 +19,10 @@ function corners = detectCorners(image, method)
         botLeft = corners.Extrema(6,:);
 
         % Mostramos las esquinas
-        imshow(image); hold on;
-        plot(corners.Extrema(:,1), corners.Extrema(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
+        %imshow(image); hold on;
+        %plot(corners.Extrema(:,1), corners.Extrema(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
     
-    % --- MÉTODO MANUAL ---
+    % --- MÉTODO MIN EIGEN ---
     else
         % --- Detectamos todas las esquinas ---
         corners = detectMinEigenFeatures(image);
@@ -87,8 +87,8 @@ function corners = detectCorners(image, method)
         topLeft = leftCorners(indexTopLeft,:);
 
         % Mostramos las esquinas
-        imshow(image); hold on;
-        plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
+        %imshow(image); hold on;
+        %plot(corners(:,1), corners(:,end), 'r*', 'LineWidth', 0.5, 'MarkerSize', 9);
     end
 
     corners = [topLeft; topRight; botRight; botLeft;];
