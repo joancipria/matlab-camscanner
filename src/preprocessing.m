@@ -33,11 +33,11 @@ function image = preprocessing(image)
     image = imfill(image,'holes');
 
     % *** Close ***
-    seCloseSize = 50;
+    seCloseSize = 130;
     seClose = strel('square',seCloseSize);
     image = imclose(image,seClose);
 
-    BW2 = bwareaopen(image, 4000);
+    BW2 = bwareaopen(image, 8000);
 
     image = BW2; 
 end
